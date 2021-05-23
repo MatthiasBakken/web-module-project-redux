@@ -4,7 +4,10 @@ import { connect } from 'react-redux';
 
 import { Link, useHistory } from 'react-router-dom';
 
-const AddMovieForm = (props) => {
+
+const AddMovieForm = ( props ) => {
+    console.log( 'addmovie', props );
+    
     const { push } = useHistory();
 
     const [movie, setMovie] = useState({
@@ -22,8 +25,15 @@ const AddMovieForm = (props) => {
         });
     }
 
-    const handleSubmit = (e) => {
-    }
+    const handleSubmit = ( e ) => {
+        e.stopPropagation();
+        e.preventDefault();
+        props.addMovie( {
+            id: Math.floor((Math.random() * 3000) + (Math.random() * 549)),
+            ...movie
+        } );
+        push( '/movies' );
+    };
 
     const { title, director, genre, metascore, description } = movie;
     return(<div className="col">
@@ -58,7 +68,7 @@ const AddMovieForm = (props) => {
                         			
                     </div>
                     <div className="modal-footer">
-                        <input type="submit" className="btn btn-success" value="Add"/>
+                        <input type="submit" className="btn btn-success" value="Add" onSubmit={handleSubmit} />
                         <Link to={`/movies`}><input type="button" className="btn btn-default" value="Cancel"/></Link>
                     </div>
                 </form>
@@ -67,4 +77,10 @@ const AddMovieForm = (props) => {
     </div>);
 }
 
-export default AddMovieForm;
+const mapStateToProps = state => {
+    return {
+        movies: state.movie.movies
+    };
+};
+
+export default connect( mapStateToProps, { addMovie } )( AddMovieForm );

@@ -1,12 +1,31 @@
 import React from 'react';
 import { useParams, useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
 
-const Movie = (props) => {
+import { deleteMovie, addFavorites } from '../actions/movieActions';
+
+
+const Movie = ( props ) => {
     const { id } = useParams();
     const { push } = useHistory();
 
-    const movies = [];
-    const movie = movies.find(movie=>movie.id===Number(id));
+    const { movies, favorites } = props;
+
+    const movie = movies.find( movie => movie.id === Number( id ) );
+    
+    const deleteMovieHandler = () => {
+        props.deleteMovie( parseInt(id) );
+        push( "/movies" );
+    };
+
+    const favoritesHandler = () => {
+        if ( favorites.find( movie => movie.id === Number( id ) ) ) {
+            return;
+        } else {
+            props.addFavorites( parseInt( id ) );
+        }
+        push( "/movies" );
+    };
     
     return(<div className="modal-page col">
         <div className="modal-dialog">
@@ -37,8 +56,8 @@ const Movie = (props) => {
                         </section>
                         
                         <section>
-                            <span className="m-2 btn btn-dark">Favorite</span>
-                            <span className="delete"><input type="button" className="m-2 btn btn-danger" value="Delete"/></span>
+                            <span className="m-2 btn btn-dark" onClick={() => favoritesHandler()} >Favorite</span>
+                            <span className="delete"><input type="button" className="m-2 btn btn-danger" value="Delete" onClick={() => deleteMovieHandler()} /></span>
                         </section>
                     </div>
                 </div>
@@ -47,4 +66,12 @@ const Movie = (props) => {
     </div>);
 }
 
-export default Movie;
+const mapStateToProps = state => {
+    return {
+        movies: state.movie.movies,
+        favorites: state.favorites.favorites
+    };
+};
+
+
+export default connect( mapStateToProps, { deleteMovie, addFavorites } )( Movie );
